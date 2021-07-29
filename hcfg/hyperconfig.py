@@ -1,10 +1,7 @@
 from os import system
 from hcfg.exceptions import *
 import json
-
-
-##Thanks for Emrah#0001
-
+import ast
 
 class hcfgdb():
     def __init__(self,fileName):
@@ -24,6 +21,17 @@ class hcfgdb():
     
     def addValue(self,variableName,_value):
         hcfg.addValue(self.file,variableName,_value)
+
+    def getObjects(self,variableID):
+        object = hcfg.readFile(self.file)
+        b = []
+        for i in object:
+            a = self.getValue(i)
+            if not a[f'{variableID}'] in a:
+                value = hcfg.assignValue(a[variableID])
+                b.append({f'{variableID}' : value})
+        return b 
+                
 
 
 
@@ -56,7 +64,8 @@ class hcfg():
                     return
                 name = object[0].strip(" ")
                 value = hcfg.assignValue(object[1])
-                if(value.startswith("{") and value.endswith("}")):
+                if(value.startswith("{")):
+                    value = value.replace("'",'"')
                     dict = json.loads(value)
                     buffer[name] = dict
                 else:
@@ -118,7 +127,7 @@ class hcfg():
         else:
             with open(filename,"a+",encoding="utf8") as file:
                 newVal = hcfg.assignValue(value)
-                file.writelines(f"{variableName} : {newVal},\n")
+                file.writelines(f"{variableName} : {newVal}\n")
                 
                 
             
